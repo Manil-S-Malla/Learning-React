@@ -3,29 +3,32 @@ import React, { Component } from 'react';
 
 class Counter extends Component {
     state = {
-        count: this.props.counter.count || 0,
         imageUrl: 'https://picsum.photos/200',
         tags: ['Tag 1', 'Tag 2', 'Tag 3']
     };
 
-    handleIncrement = (id) => {
-        console.log(id);
-        this.setState({count: this.state.count + 1});
+    componentDidUpdate(prevProps, prevState) {
+        console.log(`Update > Counter - componentDidUpdate.\n\tPrevious Props : ${prevProps}\n\tPrevious State : ${prevState}`);
     }
 
-    handleDecrement = (id) => {
-        if (this.state.count > 0) {
-            console.log(id);
-            this.setState({count: this.state.count - 1});
-        }
-        else {
-            alert("Can't go lower than 0.")
-        }
+    componentWillUnmount() {
+        console.log('UnMount > Counter - componentDidUnmount.');
+    }
+
+    getCounterClasses(count) {
+        let counterClasses = "badge m-2 badge-";
+        counterClasses += count === 0 ? "warning" : "primary";
+        return counterClasses;
     }
 
     render() { 
-        const {count, imageUrl, tags} = this.state;
+        console.log('Mount > Counter - Render.');
 
+        const {imageUrl, tags} = this.state;
+        
+        const {count, id} = this.props.counter
+        const {onIncrement, onDecrement, onDelete} = this.props;
+        
         const mainContainerStyle= {
             display: 'flex',
             flexDirection: 'row',
@@ -70,17 +73,17 @@ class Counter extends Component {
                     <div style= {subContainerStyle}>
                         <span style= {counterStyle} className= {this.getCounterClasses(count)}>{ count === 0 ? 'Zero' : count}</span>
                         <button 
-                            onClick= {() => {this.handleIncrement('Increment')}} 
+                            onClick= {() => onIncrement(id)} 
                             style= {btnStyle} 
                             className= "btn btn-outline-secondary btn-sm rounded m-2"
                         >+</button>
                         <button 
-                            onClick= {() => {this.handleDecrement('Decrement')}} 
+                            onClick= {() => onDecrement(id)} 
                             style= {btnStyle} 
                             className= "btn btn-outline-secondary btn-sm rounded m-2"
                         >-</button>
                         <button 
-                            onClick= {() => this.props.onDelete(this.props.counter.id)} 
+                            onClick= {() => onDelete(id)} 
                             className="btn btn-danger btn-sm m-2"
                         >
                             Delete
@@ -104,11 +107,6 @@ class Counter extends Component {
         );
     }
 
-    getCounterClasses(count) {
-        let counterClasses = "badge m-2 badge-";
-        counterClasses += count === 0 ? "warning" : "primary";
-        return counterClasses;
-    }
 }
  
 export default Counter;
